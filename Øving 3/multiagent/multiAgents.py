@@ -135,13 +135,13 @@ class MinimaxAgent(MultiAgentSearchAgent):
         Returns whether or not the game state is a losing state
         """
         "*** YOUR CODE HERE ***"
-        maxValue = float("-inf")
+        maxVal = float("-inf")
         maxAction = Directions.STOP
         for action in gameState.getLegalActions(0):
             nextState = gameState.generateSuccessor(0, action)
             nextValue = self.minimax(nextState, 0, 1)
-            if nextValue > maxValue:
-                maxValue = nextValue
+            if nextValue > maxVal:
+                maxVal = nextValue
                 maxAction = action
         return maxAction
     
@@ -182,22 +182,23 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         return self.alpha_beta(gameState)
 
     def alpha_beta(self, state):
-        maxValue = float("-inf")
+        # Initialize variables
+        maxVal = float("-inf")
         alpha = float("-inf")
         beta = float("inf")
         maxAction = Directions.STOP
 
-        # Iterate throguh legal actions down the three
-        for action in state.getLegalActions(0):
-            nextState = state.generateSuccessor(0, action)
+        # Search for all possible actions in the tree
+        for legalaction in state.getLegalActions(0):
+            nextState = state.generateSuccessor(0, legalaction)
             nextValue = self.getValue(nextState, 0, 1, alpha, beta)
-            if nextValue > maxValue:
-                maxValue = nextValue
-                maxAction = action
-            alpha = max(alpha, maxValue)
+            if nextValue > maxVal:
+                maxAction = legalaction
+                maxVal = nextValue
+            alpha = max(alpha, maxVal)
         return maxAction
 
-    # Help function
+    # Help function to figure out how good a move is
     def getValue(self, gameState, currentDepth, agentIndex, alpha, beta):
         if currentDepth == self.depth or gameState.isWin() or gameState.isLose():
             return self.evaluationFunction(gameState)
@@ -206,28 +207,28 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         else:
             return self.min_value(gameState, currentDepth, agentIndex, alpha, beta)
 
-    # P A C M A N
+    # Find best move for player[0] (Pacman)
     def max_value(self, gameState, currentDepth, alpha, beta):
         maxVal = float("-inf")
-        for action in gameState.getLegalActions(0):
-            # find max value for pacman
-            maxVal = max(maxVal,
-                         self.getValue(gameState.generateSuccessor(0, action), currentDepth, 1, alpha, beta))
-            # check for possible pruning
+        for legalaction in gameState.getLegalActions(0):
+            # Find best value for pacman
+            maxVal = max(maxVal, self.getValue(gameState.generateSuccessor(0, legalaction), currentDepth, 1, alpha, beta))
+            # Check if pruning is possibly
             if maxVal > beta:
                 return maxVal
             alpha = max(alpha, maxVal)
         return maxVal
 
-    # G H O S T
+    # Find best move for ghosts (worst for Pacman)
     def min_value(self, gameState, currentDepth, agentIndex, alpha, beta):
         minVal = float("inf")
-        for action in gameState.getLegalActions(agentIndex):
+        for legalaction in gameState.getLegalActions(agentIndex):
+            # Find best value for ghosts, worst for Pacman
             if agentIndex == gameState.getNumAgents() - 1:
-                minVal = min(minVal,
-                             self.getValue(gameState.generateSuccessor(agentIndex, action), currentDepth + 1, 0, alpha, beta))
+                minVal = min(minVal, self.getValue(gameState.generateSuccessor(agentIndex, legalaction), currentDepth + 1, 0, alpha, beta))
             else:
-                minVal = min(minVal, self.getValue(gameState.generateSuccessor(agentIndex, action), currentDepth, agentIndex + 1, alpha, beta))
+                minVal = min(minVal, self.getValue(gameState.generateSuccessor(agentIndex, legalaction), currentDepth, agentIndex + 1, alpha, beta))
+            # Check if pruning is possibly
             if minVal < alpha:
                 return minVal
             beta = min(beta, minVal)
