@@ -192,6 +192,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         for legalaction in state.getLegalActions(0):
             nextState = state.generateSuccessor(0, legalaction)
             nextValue = self.getValue(nextState, 0, 1, alpha, beta)
+            # Update best value if new value is better
             if nextValue > maxVal:
                 maxAction = legalaction
                 maxVal = nextValue
