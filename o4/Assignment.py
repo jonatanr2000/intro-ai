@@ -15,8 +15,8 @@ class CSP:
         self.constraints = {}
 
         # Number of failed backtracks done in CSP.backtracking_search()
-        self.failed_amount_of_backtracks = 0
-        self.amount_of_backtracs = 0
+        self.failed_backtracks = 0
+        self.backtracks = 0
 
     def add_variable(self, name, domain):
         """Add a new variable to the CSP. 'name' is the variable name
@@ -117,7 +117,19 @@ class CSP:
         if sum(len(value) for value in assignment.values()) == len(assignment):
             return assignment
         
-        #var = select_unassigned_variable(assignment)
+        var = self.select_unassigned_variable(assignment)
+        self.backtracks += 1
+
+        for value in assignment[var]:
+            ass_copy = copy.deepcopy()
+            ass_copy[var] = value
+
+            if self.inference(ass_copy, self.get_all_arcs()):
+                res = self.backtrack(ass_copy)
+                if res:
+                    return res
+
+        self.failed_backtracks += 1  # Fails if the loop returns nothing
 
     def select_unassigned_variable(self, assignment):
         """The function 'Select-Unassigned-Variable' from the pseudocode
@@ -126,7 +138,10 @@ class CSP:
         of legal values has a length greater than one.
         """
         # TODO: IMPLEMENT THIS
-        pass
+        for li in assignment.keys():  # Loops through all keys in the assignment dictionary
+            if len(assignment[li]) > 1:  # Returns a variable which has a length greater than one
+                return li
+        return None  # Returns None otherwise
 
     def inference(self, assignment, queue):
         """The function 'AC-3' from the pseudocode in the textbook.
@@ -155,7 +170,7 @@ class CSP:
 
         for x in ass_copy:
             # Find all arcs
-            arcs = list(self.(list(x), ass_copy[j]))
+            arcs = list(self.get_all_possible_pairs(list(x), ass_copy[j]))
             # If no constraints, proceed to remove x
             if len(list(filter(lambda element : element in arcs, self.constraints[i][j]))) == 0:
                 revised = True
