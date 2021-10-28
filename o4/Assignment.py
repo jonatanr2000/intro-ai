@@ -117,7 +117,7 @@ class CSP:
         if sum(len(value) for value in assignment.values()) == len(assignment):
             return assignment
         
-        var = select_unassigned_variable(assignment)
+        #var = select_unassigned_variable(assignment)
 
     def select_unassigned_variable(self, assignment):
         """The function 'Select-Unassigned-Variable' from the pseudocode
@@ -161,7 +161,7 @@ class CSP:
                 revised = True
                 ass_copy.remove(x)
         assignment[i] = ass_copy
-        return revise
+        return revised
 
 
 def create_map_coloring_csp():
