@@ -127,7 +127,10 @@ class CSP:
         is the initial queue of arcs that should be visited.
         """
         # TODO: IMPLEMENT THIS
-        pass
+        while queue:
+            i, j = queue.pop(0)  # Pops first element of queue (FIFO)
+            if self.revise(assignment, i, j):
+                queue += self.get_all_neighboring_arcs(i)
 
     def revise(self, assignment, i, j):
         """The function 'Revise' from the pseudocode in the textbook.
@@ -202,3 +205,7 @@ def print_sudoku_solution(solution):
         print("")
         if row == 2 or row == 5:
             print('------+-------+------')
+
+if __name__ == '__main__':
+    csp = create_sudoku_csp("easy.txt")
+    print(csp)
