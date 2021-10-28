@@ -14,6 +14,10 @@ class CSP:
         # the variable pair (i, j)
         self.constraints = {}
 
+        # Number of failed backtracks done in CSP.backtracking_search()
+        self.failed_amount_of_backtracks = 0
+        self.amount_of_backtracs = 0
+
     def add_variable(self, name, domain):
         """Add a new variable to the CSP. 'name' is the variable name
         and 'domain' is a list of the legal values for the variable.
@@ -108,8 +112,12 @@ class CSP:
         assignments and inferences that took place in previous
         iterations of the loop.
         """
-        # TODO: IMPLEMENT THIS
-        pass
+
+        # Checks if assignment is completed
+        if sum(len(value) for value in assignment.values()) == len(assignment):
+            return assignment
+        
+        var = select_unassigned_variable(assignment)
 
     def select_unassigned_variable(self, assignment):
         """The function 'Select-Unassigned-Variable' from the pseudocode
@@ -138,8 +146,19 @@ class CSP:
         between i and j, the value should be deleted from i's list of
         legal values in 'assignment'.
         """
-        # TODO: IMPLEMENT THIS
-        pass
+        
+        ass_copy = copy.deepcopy(assignment[i])
+        revised = False
+
+        for x in ass_copy:
+            # Find all arcs
+            arcs = list(self.(list(x), ass_copy[j]))
+            # If no constraints, proceed to remove x
+            if len(list(filter(lambda element : element in arcs, self.constraints[i][j]))) == 0:
+                revised = True
+                ass_copy.remove(x)
+        assignment[i] = ass_copy
+        return revise
 
 
 def create_map_coloring_csp():
