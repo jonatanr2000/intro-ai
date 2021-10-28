@@ -1,6 +1,6 @@
 import copy
 import itertools
-
+from time import time
 
 class CSP:
     def __init__(self):
@@ -121,7 +121,7 @@ class CSP:
         self.backtracks += 1
 
         for value in assignment[var]:
-            ass_copy = copy.deepcopy()
+            ass_copy = copy.deepcopy(assignment)
             ass_copy[var] = value
 
             if self.inference(ass_copy, self.get_all_arcs()):
@@ -153,7 +153,12 @@ class CSP:
         while queue:
             i, j = queue.pop(0)  # Pops first element of queue (FIFO)
             if self.revise(assignment, i, j):
-                queue += self.get_all_neighboring_arcs(i)
+                if len(assignment[i]) == 0:
+                    return False
+                for k, _ in self.get_all_neighboring_arcs(i):
+                    if k != j:
+                        queue.append((k, i))
+        return True
 
     def revise(self, assignment, i, j):
         """The function 'Revise' from the pseudocode in the textbook.
@@ -170,7 +175,7 @@ class CSP:
 
         for x in ass_copy:
             # Find all arcs
-            arcs = list(self.get_all_possible_pairs(list(x), ass_copy[j]))
+            arcs = list(self.get_all_possible_pairs(list(x), assignment[j]))
             # If no constraints, proceed to remove x
             if len(list(filter(lambda element : element in arcs, self.constraints[i][j]))) == 0:
                 revised = True
@@ -240,6 +245,32 @@ def print_sudoku_solution(solution):
         if row == 2 or row == 5:
             print('------+-------+------')
 
+
 if __name__ == '__main__':
-    csp = create_sudoku_csp("easy.txt")
-    print(csp)
+    csp = create_sudoku_csp('easy.txt')
+    t1 = time()
+    noe = csp.backtracking_search()
+    t2 = time()
+    print("backtrack_called", csp.backtracks, "backtrack_failed", csp.failed_backtracks, "time", t2 - t1)
+    print_sudoku_solution(noe)
+
+    csp = create_sudoku_csp('medium.txt')
+    t1 = time()
+    noe = csp.backtracking_search()
+    t2 = time()
+    print("backtrack_called", csp.backtracks, "backtrack_failed", csp.failed_backtracks, "time", t2 - t1)
+    print_sudoku_solution(noe)
+
+    csp = create_sudoku_csp('hard.txt')
+    t1 = time()
+    noe = csp.backtracking_search()
+    t2 = time()
+    print("backtrack_called", csp.backtracks, "backtrack_failed", csp.failed_backtracks, "time", t2 - t1)
+    print_sudoku_solution(noe)
+
+    csp = create_sudoku_csp('veryhard.txt')
+    t1 = time()
+    noe = csp.backtracking_search()
+    t2 = time()
+    print("backtrack_called", csp.backtracks, "backtrack_failed", csp.failed_backtracks, "time", t2 - t1)
+    print_sudoku_solution(noe)
